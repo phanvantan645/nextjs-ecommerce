@@ -1,13 +1,7 @@
 import Image from 'next/image';
+import { ToggleTheme } from '~/components/toggle-theme';
 import { Button } from '~/components/ui/button';
 
 export default function Page() {
-    return (
-        <h1>
-            Hello, Next.js!
-            <div>
-                <Button>Hello</Button>
-            </div>
-        </h1>
-    );
+    return <main>Trang chủ</main>;
 }
