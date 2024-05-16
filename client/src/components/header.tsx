@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import ButtonLogout from '~/components/button-logout';
 import { ToggleTheme } from '~/components/toggle-theme';
 
 function Header() {
@@ -10,6 +11,9 @@ function Header() {
                 </li>
                 <li>
                     <Link href='/register'>Đăng ký</Link>
+                </li>
+                <li>
+                    <ButtonLogout />
                 </li>
             </ul>
             <ToggleTheme />

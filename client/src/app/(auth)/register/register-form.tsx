@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { CheckCircledIcon, CrossCircledIcon } from '@radix-ui/react-icons';
+import { CheckCircledIcon } from '@radix-ui/react-icons';
 import { Button } from '~/components/ui/button';
 import {
     Form,
@@ -14,14 +14,20 @@ import {
 } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
 import { useToast } from '~/components/ui/use-toast';
-import envConfig from '~/config';
 import {
     RegisterBody,
     RegisterBodyType,
 } from '~/schemaValidations/auth.schema';
+import authApiRequest from '~/apiRequest/authRequest';
+import { useRouter } from 'next/navigation';
+import { handleErrorApi } from '~/lib/utils';
+import { useState } from 'react';
 
 function RegisterForm() {
+    const [loading, setLoading] = useState(false);
     const { toast } = useToast();
+    const router = useRouter();
+
     // 1. Define your form.
     const form = useForm<RegisterBodyType>({
         resolver: zodResolver(RegisterBody),
@@ -35,40 +41,27 @@ function RegisterForm() {
 
     // 2. Define a submit handler.
     async function onSubmit(values: RegisterBodyType) {
+        if (loading) return;
+        setLoading(true);
         try {
-            const result = await fetch(
-                `${envConfig.NEXT_PUBLIC_API_ENDPOINT}/auth/register`,
-                {
-                    body: JSON.stringify(values),
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    method: 'POST',
-                }
-            ).then(async response => {
-                const payload = await response.json();
-                const data = {
-                    status: response.status,
-                    payload,
-                };
-                if (!response.ok) {
-                    throw data;
-                }
-                return data;
+            const result = await authApiRequest.register(values);
+            await authApiRequest.auth({
+                sessionToken: result.payload.data.token,
+                expiresAt: result.payload.data.expiresAt,
             });
+            router.push('/me');
             toast({
                 description: (
                     <div className='flex gap-1 items-center text-[#22c55e]'>
                         {result.payload.message}
-                        <CheckCircledIcon className='size-4' />
+                        <CheckCircledIcon className='size-4 ' />
                     </div>
                 ),
             });
         } catch (error: any) {
-            toast({
-                variant: 'destructive',
-                description: 'Địa chỉ Email đã được đăng ký!',
-            });
+            handleErrorApi({ error, setError: form.setError });
+        } finally {
+            setLoading(false);
         }
     }
     return (
