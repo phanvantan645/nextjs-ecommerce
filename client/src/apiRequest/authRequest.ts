@@ -1,5 +1,9 @@
 import http from '~/lib/http';
 import {
+    AccountResType,
+    UpdateMeBodyType,
+} from '~/schemaValidations/account.schema';
+import {
     LoginBodyType,
     LoginResType,
     RegisterBodyType,
@@ -45,6 +49,8 @@ const authApiRequest = {
             {},
             { baseUrl: '' }
         ),
+    updateMe: (body: UpdateMeBodyType) =>
+        http.put<AccountResType>('/account/me', body),
 };
 
 export default authApiRequest;

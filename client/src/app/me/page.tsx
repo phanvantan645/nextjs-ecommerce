@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import Profile from '~/app/me/profile';
+import ProfileForm from '~/app/me/profile-form';
 import accountApiRequest from '~/apiRequest/account';
 
 export default async function MyProfile() {
@@ -7,9 +7,9 @@ export default async function MyProfile() {
     const sessionToken = cockieStore.get('sessionToken');
     const result = await accountApiRequest.me(sessionToken?.value ?? '');
     return (
-        <div>
-            <h1>Xin chào {result.payload.data.name}</h1>
-            <Profile />
+        <div className='flex items-center flex-col'>
+            <h2 className='text-xl text-center font-semibold'>Trang cá nhân</h2>
+            <ProfileForm profile={result.payload.data} />
         </div>
     );
 }
