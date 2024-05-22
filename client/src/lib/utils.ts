@@ -47,3 +47,11 @@ export const normalizePath = (path: string) => {
 export const decodeJWT = <Payload = any>(token: string) => {
     return jwt.decode(token) as Payload;
 };
+
+/**
+ * add dots
+ */
+
+export function numberWithCommas(x: number) {
+    return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, '.');
+}

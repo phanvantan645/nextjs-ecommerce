@@ -111,6 +111,7 @@ const request = async <Response>(
         } as any,
         body,
         method,
+        cache: 'no-store',
     });
     const payload: Response = await res.json();
     const data = {
@@ -199,10 +200,10 @@ const http = {
     },
     delete<Response>(
         url: string,
-        body: any,
+        body?: any,
         options?: Omit<CustomOptions, 'body'> | undefined
     ) {
-        return request<Response>('GET', url, { ...options, body });
+        return request<Response>('DELETE', url, { ...options, body });
     },
 };
 

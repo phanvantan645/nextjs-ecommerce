@@ -49,8 +49,6 @@ const authApiRequest = {
             {},
             { baseUrl: '' }
         ),
-    updateMe: (body: UpdateMeBodyType) =>
-        http.put<AccountResType>('/account/me', body),
 };
 
 export default authApiRequest;

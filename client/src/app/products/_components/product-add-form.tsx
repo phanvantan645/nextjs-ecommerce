@@ -15,17 +15,21 @@ import {
 import { Input } from '~/components/ui/input';
 import { useToast } from '~/components/ui/use-toast';
 import { useRouter } from 'next/navigation';
-import { handleErrorApi } from '~/lib/utils';
+import { handleErrorApi, numberWithCommas } from '~/lib/utils';
 import { useRef, useState } from 'react';
 import {
     CreateProductBody,
     CreateProductBodyType,
+    ProductResType,
+    UpdateProductBodyType,
 } from '~/schemaValidations/product.schema';
 import productApiRequest from '~/apiRequest/product';
 import { Textarea } from '~/components/ui/textarea';
 import Image from 'next/image';
 
-function ProductAddForm() {
+type Product = ProductResType['data'];
+
+function ProductAddForm({ product }: { product?: Product }) {
     const [loading, setLoading] = useState(false);
     const [file, setFile] = useState<File | null>(null);
     const { toast } = useToast();
@@ -35,16 +39,14 @@ function ProductAddForm() {
     const form = useForm<CreateProductBodyType>({
         resolver: zodResolver(CreateProductBody),
         defaultValues: {
-            name: '',
-            price: 0,
-            description: '',
-            image: '',
+            name: product?.name ?? '',
+            price: product?.price ?? 0,
+            description: product?.description ?? '',
+            image: product?.image ?? '',
         },
     });
 
-    // 2. Define a submit handler.
-    async function onSubmit(values: CreateProductBodyType) {
-        if (loading) return;
+    const createProduct = async (values: CreateProductBodyType) => {
         setLoading(true);
         try {
             const formData = new FormData();
@@ -71,7 +73,47 @@ function ProductAddForm() {
         } finally {
             setLoading(false);
         }
+    };
+    const updateProduct = async (_values: UpdateProductBodyType) => {
+        if (!product) return;
+        let values = _values;
+        setLoading(true);
+        try {
+            if (file) {
+                const formData = new FormData();
+                formData.append('file', file as Blob);
+                const uploadImageResult = await productApiRequest.uploadImage(
+                    formData
+                );
+                const imageUrl = uploadImageResult.payload.data;
+                values = {
+                    ...values,
+                    image: imageUrl,
+                };
+            }
+            const result = await productApiRequest.update(product.id, values);
+            toast({
+                description: (
+                    <div className='flex gap-1 items-center text-[#22c55e]'>
+                        {result.payload.message}
+                        <CheckCircledIcon className='size-4 ' />
+                    </div>
+                ),
+            });
+        } catch (error: any) {
+            handleErrorApi({ error, setError: form.setError });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // 2. Define a submit handler.
+    async function onSubmit(values: CreateProductBodyType) {
+        if (loading) return;
+        if (product) await updateProduct(values);
+        else await createProduct(values);
     }
+    const image = form.watch('image');
     return (
         <Form {...form}>
             <form
@@ -157,10 +199,10 @@ function ProductAddForm() {
                         </FormItem>
                     )}
                 />
-                {file && (
+                {(file || image) && (
                     <div className='mt-2'>
                         <Image
-                            src={URL.createObjectURL(file)}
+                            src={file ? URL.createObjectURL(file) : image}
                             width={128}
                             height={128}
                             alt='Preview'
@@ -184,7 +226,7 @@ function ProductAddForm() {
                     </div>
                 )}
                 <Button type='submit' className='!mt-8 w-full font-semibold'>
-                    Thêm
+                    {product ? 'Cập nhật sản phẩm' : 'Thêm sản phẩm'}
                 </Button>
             </form>
         </Form>

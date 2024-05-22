@@ -14,7 +14,6 @@ import {
 } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
 import { useToast } from '~/components/ui/use-toast';
-import authApiRequest from '~/apiRequest/authRequest';
 import { useRouter } from 'next/navigation';
 import { handleErrorApi } from '~/lib/utils';
 import { useState } from 'react';
@@ -23,6 +22,7 @@ import {
     UpdateMeBody,
     UpdateMeBodyType,
 } from '~/schemaValidations/account.schema';
+import accountApiRequest from '~/apiRequest/account';
 
 type ProfileType = AccountResType['data'];
 
@@ -43,7 +43,7 @@ function ProfileForm({ profile }: { profile: ProfileType }) {
         if (loading) return;
         setLoading(true);
         try {
-            const result = await authApiRequest.updateMe(values);
+            const result = await accountApiRequest.updateMe(values);
             toast({
                 description: (
                     <div className='flex gap-1 items-center text-[#22c55e]'>

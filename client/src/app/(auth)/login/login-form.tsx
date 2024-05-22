@@ -43,7 +43,7 @@ function LoginForm() {
                 sessionToken: result.payload.data.token,
                 expiresAt: result.payload.data.expiresAt,
             });
-            router.push('/me');
+            router.refresh();
             toast({
                 description: (
                     <div className='flex gap-1 items-center text-[#22c55e]'>

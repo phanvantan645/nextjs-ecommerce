@@ -9,7 +9,6 @@ import { clientSessionToken } from '~/lib/http';
 
 export default function Logout() {
     const router = useRouter();
-    const pathname = usePathname();
     const searchParam = useSearchParams();
     const sessionToken = searchParam.get('sessionToken');
     useEffect(() => {
