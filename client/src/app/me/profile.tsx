@@ -9,7 +9,6 @@ export default function Profile() {
         const fetchProfile = async () => {
             try {
                 const result = await accountApiRequest.meClient();
-                console.log(result);
             } catch (error) {
                 handleErrorApi({
                     error,

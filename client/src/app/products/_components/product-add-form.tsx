@@ -92,6 +92,7 @@ function ProductAddForm({ product }: { product?: Product }) {
                 };
             }
             const result = await productApiRequest.update(product.id, values);
+            router.push('/products');
             toast({
                 description: (
                     <div className='flex gap-1 items-center text-[#22c55e]'>

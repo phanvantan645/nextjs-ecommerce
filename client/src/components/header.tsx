@@ -3,15 +3,12 @@ import Link from 'next/link';
 import accountApiRequest from '~/apiRequest/account';
 import ButtonLogout from '~/components/button-logout';
 import { ToggleTheme } from '~/components/toggle-theme';
+import { AccountResType } from '~/schemaValidations/account.schema';
 
-async function Header() {
+async function Header({ user }: { user: AccountResType['data'] | null }) {
     const cookieStore = cookies();
     const sessionToken = cookieStore.get('sessionToken');
-    let user = null;
-    if (sessionToken) {
-        const profile = await accountApiRequest.me(sessionToken?.value);
-        user = profile.payload.data;
-    }
+
     return (
         <div className='flex justify-center w-[100%]'>
             <div className='w-[1280px] h-[60px] px-4 flex items-center justify-between'>

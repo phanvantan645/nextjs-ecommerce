@@ -1,4 +1,12 @@
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: 'Danh sách sản phẩm | Quản lý bán hàng',
+    description: 'Tất cả sản phẩm của trang web',
+};
+
 import { Pencil1Icon, PlusIcon, TrashIcon } from '@radix-ui/react-icons';
+import { cookies } from 'next/headers';
 import Image from 'next/image';
 import Link from 'next/link';
 import productApiRequest from '~/apiRequest/product';
@@ -7,6 +15,9 @@ import { Button } from '~/components/ui/button';
 import { numberWithCommas } from '~/lib/utils';
 
 export default async function ProductListPage() {
+    const cookieStore = cookies();
+    const sessionToken = cookieStore.get('sessionToken');
+    const isAuthenticated = Boolean(sessionToken);
     const { payload } = await productApiRequest.getList();
     const productList = payload.data;
     return (
@@ -19,7 +30,10 @@ export default async function ProductListPage() {
                             key={product.id}
                             className='flex justify-between items-center py-2'
                         >
-                            <div className='flex'>
+                            <Link
+                                href={`/products/${product.id}`}
+                                className='flex'
+                            >
                                 <Image
                                     className='object-cover mr-2'
                                     width={50}
@@ -34,26 +48,30 @@ export default async function ProductListPage() {
                                         vnđ
                                     </p>
                                 </div>
-                            </div>
-                            <div>
-                                <Link
-                                    href={`/products/${product.id}`}
-                                    className='mr-2'
-                                >
-                                    <Button>
-                                        <Pencil1Icon />
-                                        <span className='ml-1'>Sửa</span>
-                                    </Button>
-                                </Link>
-                                <DeleteProduct product={product} />
-                            </div>
+                            </Link>
+                            {isAuthenticated && (
+                                <div>
+                                    <Link
+                                        href={`/products/edit/${product.id}`}
+                                        className='mr-2'
+                                    >
+                                        <Button>
+                                            <Pencil1Icon />
+                                            <span className='ml-1'>Sửa</span>
+                                        </Button>
+                                    </Link>
+                                    <DeleteProduct product={product} />
+                                </div>
+                            )}
                         </div>
                     ))}
                     <Link href='/products/add'>
-                        <Button className='mt-3'>
-                            <PlusIcon />
-                            <span className='ml-1'>Thêm sản phẩm</span>
-                        </Button>
+                        {isAuthenticated && (
+                            <Button className='mt-3'>
+                                <PlusIcon />
+                                <span className='ml-1'>Thêm sản phẩm</span>
+                            </Button>
+                        )}
                     </Link>
                 </div>
             </div>

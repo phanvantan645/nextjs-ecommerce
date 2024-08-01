@@ -23,10 +23,12 @@ import {
     UpdateMeBodyType,
 } from '~/schemaValidations/account.schema';
 import accountApiRequest from '~/apiRequest/account';
+import { useAppContext } from '~/app/app-provider';
 
 type ProfileType = AccountResType['data'];
 
 function ProfileForm({ profile }: { profile: ProfileType }) {
+    const { setUser } = useAppContext();
     const [loading, setLoading] = useState(false);
     const { toast } = useToast();
     const router = useRouter();
@@ -53,6 +55,7 @@ function ProfileForm({ profile }: { profile: ProfileType }) {
                 ),
             });
             router.refresh();
+            setUser(result.payload.data);
         } catch (error: any) {
             handleErrorApi({ error, setError: form.setError });
         } finally {

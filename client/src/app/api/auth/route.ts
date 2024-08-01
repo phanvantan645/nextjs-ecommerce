@@ -1,5 +1,6 @@
 export async function POST(request: Request) {
     const body = await request.json();
+    console.log(body);
     const sessionToken = body?.sessionToken as string;
     const expiresAt = body.expiresAt as string;
     if (!sessionToken) {
